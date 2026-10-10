@@ -1,0 +1,139 @@
+function GitAud(soundgit,filename)
+    local url=soundgit
+    local FileName = filename
+    writefile(FileName..".mp3", game:HttpGet(url))
+    return (getcustomasset or getsynasset)(FileName..".mp3")
+end
+
+function CustomGitSound(soundlink, vol, filename)
+    local sound = Instance.new("Sound")
+    sound.SoundId = GitAud(soundlink, filename)
+    sound.Parent = workspace
+    sound.Name = "spawn"
+    sound.Volume = vol
+    sound:Play()
+    game:GetService("Debris"):AddItem(sound, 5) -- Automatically cleans up the sound instance after 5 seconds
+end
+
+-- Function specifically for playing the damage sound
+local function playDamageSound()
+    local damageSoundLink = "https://github.com/brylesantos38-cell/MufflerDamageSound.mp3/blob/main/Record_2026-06-17-06-43-16%20(1).mp3?raw=true"
+    CustomGitSound(damageSoundLink, 1, "damage_sound")
+end
+
+-- New main sound link applied here
+CustomGitSound("https://github.com/brylesantos38-cell/MufflerDamageSound.mp3/blob/main/Record_2026-06-17-07-08-26.mp3?raw=true", 1, " spawn")
+
+-- Changed from wait(7) to wait(5) because the new audio is cut to 5 seconds
+wait(5)
+
+-- Services
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+
+-- Get Local Player
+local player = Players.LocalPlayer
+local chr = player.Character or player.CharacterAdded:Wait()
+
+-- Wait until "Crouching" attribute exists
+if chr:GetAttribute("Crouching") == nil then
+    chr:SetAttribute("Crouching", false)
+end
+
+-- Create UI Container
+local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+screenGui.Name = "CrouchPrompt"
+screenGui.ResetOnSpawn = false
+
+-- Create Background Image Label
+local imageLabel = Instance.new("ImageLabel", screenGui)
+imageLabel.Size = UDim2.new(0.4, 0, 0.4, 0) 
+imageLabel.Position = UDim2.new(0.3, 0, 0.3, 0) 
+imageLabel.BackgroundTransparency = 1
+imageLabel.Image = "rbxassetid://131767322927740" -- Image Asset ID
+imageLabel.ImageTransparency = 1 -- Start fully invisible
+
+-- Create Text Label (Placed inside the image so it sits on top)
+local textLabel = Instance.new("TextLabel", imageLabel)
+textLabel.Size = UDim2.new(1, 0, 1, 0) -- Fills the entire size of the image background
+textLabel.Position = UDim2.new(0, 0, 0, 0)
+textLabel.Text = "CROUCH"
+textLabel.TextScaled = true
+textLabel.BackgroundTransparency = 1
+textLabel.TextColor3 = Color3.new(0.96, 0.96, 0.86) -- BEIGE TEXT
+textLabel.Font = Enum.Font.Oswald
+textLabel.TextTransparency = 1 -- Start fully invisible to match background
+
+-- Tween Configurations (Fades both Image and Text simultaneously)
+local fadeInInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+local fadeOutInfo = TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In) -- Slowly disappears
+
+-- Tweens for the Image Background
+local imgFadeIn = TweenService:Create(imageLabel, fadeInInfo, {ImageTransparency = 0})
+local imgFadeOut = TweenService:Create(imageLabel, fadeOutInfo, {ImageTransparency = 1})
+
+-- Tweens for the Text Overlaid on top
+local txtFadeIn = TweenService:Create(textLabel, fadeInInfo, {TextTransparency = 0})
+local txtFadeOut = TweenService:Create(textLabel, fadeOutInfo, {TextTransparency = 1})
+
+-- 1. "CROUCH" Phase: Make image background and text appear quickly
+imgFadeIn:Play()
+txtFadeIn:Play()
+
+-- Give player 2 seconds to crouch
+wait(2)
+
+if not chr:GetAttribute("Crouching") then
+    -- Not crouching → Play sound and Take 40 damage
+    playDamageSound()
+    local humanoid = chr:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        humanoid:TakeDamage(40)
+    end
+    screenGui:Destroy()
+    return
+end
+
+-- Player crouched in time → wait 3 more seconds
+wait(3)
+
+-- 2. "STAND UP" Phase: Switch text and start the slow fade out
+textLabel.Text = "STAND UP"
+imgFadeOut:Play()
+txtFadeOut:Play()
+
+-- Wait 1 extra second before checking
+wait(1)
+
+-- Check if player stands up within ~3 seconds
+local stoodUp = false
+for i = 1, 30 do
+    if not chr:GetAttribute("Crouching") then
+        stoodUp = true
+        break
+    end
+    wait(0.1)
+end
+
+if not stoodUp then
+    -- Still crouching → Play sound and Take 30 damage
+    playDamageSound()
+    local humanoid = chr:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        humanoid:TakeDamage(30)
+    end
+end
+
+-- Clean up
+screenGui:Destroy()
+
+---====== Load achievement giver ======---
+local achievementGiver = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Doors/Custom%20Achievements/Source.lua"))()
+
+---====== Display achievement ======---
+achievementGiver({
+    Title = "Muted out",
+    Desc = "Shh!",
+    Reason = "Encounter muffler",
+    Image = "rbxassetid://118156815484657"
+})

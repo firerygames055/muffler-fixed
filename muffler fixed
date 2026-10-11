@@ -57,7 +57,7 @@ imageLabel.ImageTransparency = 1 -- Start fully invisible
 local textLabel = Instance.new("TextLabel", imageLabel)
 textLabel.Size = UDim2.new(1, 0, 1, 0) -- Fills the entire size of the image background
 textLabel.Position = UDim2.new(0, 0, 0, 0)
-textLabel.Text = "CROUCH"
+textLabel.Text = "crouch"
 textLabel.TextScaled = true
 textLabel.BackgroundTransparency = 1
 textLabel.TextColor3 = Color3.new(0.96, 0.96, 0.86) -- BEIGE TEXT
@@ -97,7 +97,7 @@ end
 -- Player crouched in time → wait 3 more seconds
 wait(3)
 
--- 2. "STAND UP" Phase: Switch text and start the slow fade out
+-- 2. "stand up" Phase: Switch text and start the slow fade out
 textLabel.Text = "STAND UP"
 imgFadeOut:Play()
 txtFadeOut:Play()

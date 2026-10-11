@@ -76,7 +76,7 @@ local imgFadeOut = TweenService:Create(imageLabel, fadeOutInfo, {ImageTransparen
 local txtFadeIn = TweenService:Create(textLabel, fadeInInfo, {TextTransparency = 0})
 local txtFadeOut = TweenService:Create(textLabel, fadeOutInfo, {TextTransparency = 1})
 
--- 1. "CROUCH" Phase: Make image background and text appear quickly
+-- 1. "crouch" Phase: Make image background and text appear quickly
 imgFadeIn:Play()
 txtFadeIn:Play()
 
@@ -98,7 +98,7 @@ end
 wait(3)
 
 -- 2. "stand up" Phase: Switch text and start the slow fade out
-textLabel.Text = "STAND UP"
+textLabel.Text = "stand up"
 imgFadeOut:Play()
 txtFadeOut:Play()
 
